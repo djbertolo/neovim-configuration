@@ -31,6 +31,12 @@ return {
 			else
 				custom_theme[mode].b.fg = colors.gray
 			end
+
+			-- Set line number color for the initial load
+			vim.api.nvim_set_hl(0, "CursorLineNr", {
+				fg = mode_color,
+				bold = true,
+			})
 		end
 
 		set_mode_colors("normal", colors.pink)
@@ -105,6 +111,23 @@ return {
 				lualine_y = { "progress" },
 				lualine_z = { "location" },
 			},
+		})
+		-- Dynamic Line Number Color Switcher
+		vim.api.nvim_create_autocmd("ModeChanged", {
+			callback = function()
+				local mode = vim.fn.mode()
+				local mode_color = colors.pink -- Default (Normal)
+
+				if mode == "i" then
+					mode_color = colors.blue
+				elseif mode:match("[vV\22]") then -- Visual, Visual Line, Visual Block
+					mode_color = colors.purple
+				elseif mode == "c" then
+					mode_color = colors.brown
+				end
+
+				vim.api.nvim_set_hl(0, "CursorLineNr", { fg = mode_color, bold = true })
+			end,
 		})
 	end,
 }

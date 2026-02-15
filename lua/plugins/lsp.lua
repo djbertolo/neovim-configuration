@@ -5,6 +5,7 @@ return {
 		"williamboman/mason-lspconfig.nvim",
 	},
 	config = function()
+		require("lazydev").setup({})
 		require("mason").setup()
 
 		require("mason-lspconfig").setup({
@@ -14,33 +15,20 @@ return {
 				function(server_name)
 					require("lspconfig")[server_name].setup({})
 				end,
-
-				-- Specific override for Lua to fix the "undefined global 'vim'" warning
-				["lua_ls"] = function()
-					require("lspconfig").lua_ls.setup({
-						settings = {
-							Lua = {
-								diagnostics = {
-									globals = { "vim" },
-								},
-							},
-						},
-					})
-				end,
 			},
 		})
 
 		-- Global Keymaps (only work when an LSP is active)
-		vim.api.nvim_create_autocmd('LspAttach', {
-			group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+		vim.api.nvim_create_autocmd("LspAttach", {
+			group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 			callback = function(ev)
 				local opts = { buffer = ev.buf }
-				vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-				vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-				vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-				vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
-				vim.keymap.set({ 'n', 'v' }, '<space>ca', vim.lsp.buf.code_action, opts)
+				vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+				vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+				vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+				vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
+				vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, opts)
 			end,
 		})
-	end
+	end,
 }
