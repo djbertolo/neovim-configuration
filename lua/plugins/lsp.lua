@@ -5,20 +5,38 @@ return {
 		"williamboman/mason-lspconfig.nvim",
 	},
 	config = function()
-		require("lazydev").setup({})
+		-- Mason setup
 		require("mason").setup()
 
 		require("mason-lspconfig").setup({
 			ensure_installed = { "clangd", "gopls", "lua_ls", "texlab" },
-			-- This function automatically sets up any server installed by Mason
 			handlers = {
 				function(server_name)
 					require("lspconfig")[server_name].setup({})
 				end,
+
+				-- Targeted fix for lua_ls
+				["lua_ls"] = function()
+					require("lspconfig").lua_ls.setup({
+						settings = {
+							Lua = {
+								diagnostics = {
+									-- Explicitly add 'vim' to globals
+									globals = { "vim" },
+								},
+								workspace = {
+									-- Make server aware of Neovim runtime files
+									library = vim.api.nvim_get_runtime_file("", true),
+									checkThirdParty = false,
+								},
+							},
+						},
+					})
+				end,
 			},
 		})
 
-		-- Global Keymaps (only work when an LSP is active)
+		-- Global Keymaps
 		vim.api.nvim_create_autocmd("LspAttach", {
 			group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 			callback = function(ev)
