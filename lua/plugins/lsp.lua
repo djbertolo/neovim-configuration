@@ -5,7 +5,6 @@ return {
 		"williamboman/mason-lspconfig.nvim",
 	},
 	config = function()
-		-- Mason setup
 		require("mason").setup()
 
 		require("mason-lspconfig").setup({
@@ -15,20 +14,19 @@ return {
 					require("lspconfig")[server_name].setup({})
 				end,
 
-				-- Targeted fix for lua_ls
 				["lua_ls"] = function()
 					require("lspconfig").lua_ls.setup({
 						settings = {
 							Lua = {
 								diagnostics = {
-									-- Explicitly add 'vim' to globals
 									globals = { "vim" },
 								},
 								workspace = {
-									-- Make server aware of Neovim runtime files
-									library = vim.api.nvim_get_runtime_file("", true),
+									-- Removed heavy manual library call to fix slowness
+									-- lazydev.nvim now handles this automatically
 									checkThirdParty = false,
 								},
+								telemetry = { enable = false },
 							},
 						},
 					})
@@ -46,10 +44,7 @@ return {
 				vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
 				vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
 				vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, opts)
-				-- Shift + E: Open floating diagnostic for the current line
 				vim.keymap.set("n", "<Leader>ce", vim.diagnostic.open_float, opts)
-
-				-- Control + Shift + E: Open the project-wide Quickfix list
 				vim.keymap.set("n", "<Leader>cae", vim.diagnostic.setqflist, opts)
 			end,
 		})
